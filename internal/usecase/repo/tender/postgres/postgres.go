@@ -7,16 +7,16 @@ import (
 	"log"
 )
 
-type postgresTenderRepository struct {
+type postgresTenderRepo struct {
 	DB *sql.DB
 }
 
-func NewPostgresTenderRepository(db *sql.DB) uc.TenderRepository {
-	return &postgresTenderRepository{
+func NewPostgresTenderRepo(db *sql.DB) uc.TenderRepo {
+	return &postgresTenderRepo{
 		DB: db,
 	}
 }
-func (r *postgresTenderRepository) CreateTender(tender *tender.Tender, username string) (string, error) {
+func (r *postgresTenderRepo) CreateTender(tender *tender.Tender, username string) (string, error) {
 	const op = "postgres.tender.CreateTender:"
 
 	query := `
@@ -32,7 +32,7 @@ func (r *postgresTenderRepository) CreateTender(tender *tender.Tender, username 
 	return tender.ID, nil
 }
 
-func (r *postgresTenderRepository) GetStatus(tenderID string) (tender.StatusType, error) {
+func (r *postgresTenderRepo) GetStatus(tenderID string) (tender.StatusType, error) {
 	const op = "postgres.tender.GetStatus:"
 
 	query := `SELECT status FROM tender WHERE id = $1`
@@ -45,7 +45,7 @@ func (r *postgresTenderRepository) GetStatus(tenderID string) (tender.StatusType
 	return status, nil
 }
 
-func (r *postgresTenderRepository) GetByID(tenderID string) (*tender.Tender, error) {
+func (r *postgresTenderRepo) GetByID(tenderID string) (*tender.Tender, error) {
 	const op = "postgres.tender.GetByID:"
 	query := `
 		SELECT id, name, description, serviceType, organization_id, creator_id, status, current_version, created_at, updated_at
@@ -61,7 +61,7 @@ func (r *postgresTenderRepository) GetByID(tenderID string) (*tender.Tender, err
 	return &tender, nil
 }
 
-func (r *postgresTenderRepository) GetVersionByID(tenderID string, version int) (*tender.Tender, error) {
+func (r *postgresTenderRepo) GetVersionByID(tenderID string, version int) (*tender.Tender, error) {
 	const op = "postgres.tender.GetVersionByID:"
 
 	query := `
@@ -78,7 +78,7 @@ func (r *postgresTenderRepository) GetVersionByID(tenderID string, version int) 
 	return &oldTender, nil
 }
 
-func (r *postgresTenderRepository) ChangeStatus(tenderID string, username string, newStatus tender.StatusType) error {
+func (r *postgresTenderRepo) ChangeStatus(tenderID string, username string, newStatus tender.StatusType) error {
 	const op = "postgres.tender.ChangeStatus"
 
 	query := `UPDATE tender SET status = $2, updated_at = NOW() WHERE id = $1`
@@ -89,7 +89,7 @@ func (r *postgresTenderRepository) ChangeStatus(tenderID string, username string
 	return err
 }
 
-func (r *postgresTenderRepository) EditTender(updatedTender *tender.Tender, username string) error {
+func (r *postgresTenderRepo) EditTender(updatedTender *tender.Tender, username string) error {
 	const op = "postgres.tender.Editender:"
 
 	query := `
@@ -105,7 +105,7 @@ func (r *postgresTenderRepository) EditTender(updatedTender *tender.Tender, user
 }
 
 // limit=-1 returns all published tenders
-func (r *postgresTenderRepository) GetPublishedTenders(limit, offset int, serviceType string) ([]*tender.Tender, error) {
+func (r *postgresTenderRepo) GetPublishedTenders(limit, offset int, serviceType string) ([]*tender.Tender, error) {
 	const op = "postgres.tender.GetPublishedTenders:"
 
 	query := `
@@ -133,6 +133,7 @@ func (r *postgresTenderRepository) GetPublishedTenders(limit, offset int, servic
 
 	rows, err := r.DB.Query(query, args...)
 	if err != nil {
+		log.Println(op, err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -151,7 +152,7 @@ func (r *postgresTenderRepository) GetPublishedTenders(limit, offset int, servic
 	return tenders, nil
 }
 
-func (r *postgresTenderRepository) GetTendersByResponsibleUser(username string, limit, offset int, serviceType string) ([]*tender.Tender, error) {
+func (r *postgresTenderRepo) GetTendersByResponsibleUser(username string, limit, offset int, serviceType string) ([]*tender.Tender, error) {
 	const op = "postgres.tender.GetTendersByResponsibleUser:"
 
 	query := `
@@ -172,6 +173,7 @@ func (r *postgresTenderRepository) GetTendersByResponsibleUser(username string, 
 	query += " LIMIT $2 OFFSET $3"
 	rows, err := r.DB.Query(query, args...)
 	if err != nil {
+		log.Println(op, err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -191,7 +193,7 @@ func (r *postgresTenderRepository) GetTendersByResponsibleUser(username string, 
 }
 
 // returns tenders for which user is responsible for
-func (r *postgresTenderRepository) GetOwnedTenders(limit, offset int, username string) ([]*tender.Tender, error) {
+func (r *postgresTenderRepo) GetOwnedTenders(limit, offset int, username string) ([]*tender.Tender, error) {
 	const op = "postgres.tender.GetOwnedTenders:"
 
 	query := `

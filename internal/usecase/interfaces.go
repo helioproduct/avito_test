@@ -14,17 +14,17 @@ type (
 		ChangeStatus(bidID string, username string, newStatus bid.BidStatus) (*bid.Bid, error)
 		Edit(updatedBid *bid.Bid, username string) (*bid.Bid, error)
 		GetBidByID(bidID string) (*bid.Bid, error)
-		ChangeDecision(bidID string, username string, decision bid.Decision) (*bid.Bid, error)
+		MakeDecision(bidID string, username string, decision bid.Decision) (*bid.Bid, error)
 		GetBidsForTender(tenderID string, username string, limit, offset int) ([]*bid.Bid, error)
 		GetBidsByUser(username string, limit, offset int) ([]*bid.Bid, error)
 	}
 
-	BidRepository interface {
+	BidRepo interface {
 		CreateBid(bid *bid.Bid) (string, error)
 		GetBidByID(bidID string) (*bid.Bid, error)
 		EditBid(updatedBid *bid.Bid) error
 		ChangeStatus(bidID, username string, newStatus bid.BidStatus) error
-		ChangeDecision(bidID, username string, decision bid.Decision) error
+		MakeDecision(bidID, username string, decision bid.Decision) error
 		GetBids(tenderID string, username string, limit, offset int) ([]*bid.Bid, error)
 		GetBidsByUser(username string, limit, offset int) ([]*bid.Bid, error)
 	}
@@ -35,7 +35,7 @@ type (
 		GetAllUsers() ([]*user.User, error)
 	}
 
-	UserRepository interface {
+	UserRepo interface {
 		CreateUser(user *user.User) error
 		GetUserByID(id string) (*user.User, error)
 		GetUserByUsername(username string) (*user.User, error)
@@ -53,7 +53,7 @@ type (
 		GetByID(tenderID, username string) (*tender.Tender, error)
 	}
 
-	TenderRepository interface {
+	TenderRepo interface {
 		CreateTender(tender *tender.Tender, username string) (string, error)
 		GetStatus(tenderID string) (tender.StatusType, error)
 		GetByID(tenderID string) (*tender.Tender, error)
@@ -75,7 +75,7 @@ type (
 		GetUserOrganizationID(userID string) (string, error)
 	}
 
-	OrganizationRepository interface {
+	OrganizationRepo interface {
 		Create(organization *organization.Organization) (string, error)
 		GetByName(name string) (*organization.Organization, error)
 		GetResponsibleUsers(organizationID string) ([]user.User, error)

@@ -17,15 +17,15 @@ var (
 )
 
 type bidUseCase struct {
-	bidRepo    BidRepository
-	orgRepo    OrganizationRepository
-	userRepo   UserRepository
-	tenderRepo TenderRepository
+	bidRepo    BidRepo
+	orgRepo    OrganizationRepo
+	userRepo   UserRepo
+	tenderRepo TenderRepo
 }
 
-func NewBidUseCase(bidRepo BidRepository,
-	orgRepo OrganizationRepository, userRepo UserRepository,
-	tenderRepo TenderRepository) *bidUseCase {
+func NewBidUseCase(bidRepo BidRepo,
+	orgRepo OrganizationRepo, userRepo UserRepo,
+	tenderRepo TenderRepo) BidUseCase {
 
 	return &bidUseCase{
 		bidRepo:    bidRepo,
@@ -148,7 +148,8 @@ func (uc *bidUseCase) GetBidByID(bidID string) (*bid.Bid, error) {
 	return bid, nil
 }
 
-func (uc *bidUseCase) ChangeDecision(bidID string, username string, decision bid.Decision) (*bid.Bid, error) {
+func (uc *bidUseCase) MakeDecision(bidID string, username string, decision bid.Decision) (*bid.Bid, error) {
+
 	// Ensure the decision is valid
 	if decision != bid.Approved && decision != bid.Rejected {
 		return nil, ErrInvalidDecision
@@ -179,7 +180,7 @@ func (uc *bidUseCase) ChangeDecision(bidID string, username string, decision bid
 		}
 	}
 
-	err = uc.bidRepo.ChangeDecision(bidID, username, decision)
+	err = uc.bidRepo.MakeDecision(bidID, username, decision)
 	if err != nil {
 		return nil, ErrInvalidDecision
 	}

@@ -313,6 +313,7 @@ func (h *BidHandlers) EditBidHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *BidHandlers) SubmitDesisionHandler(w http.ResponseWriter, r *http.Request) {
 	const op = "routes.bids.Submitdecision:"
+	log.Println(op)
 
 	bidID := r.PathValue("bidId")
 	if bidID == "" {
@@ -335,7 +336,7 @@ func (h *BidHandlers) SubmitDesisionHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	bid, err := h.bidsUC.ChangeDecision(bidID, username, bid.Decision(decision))
+	bid, err := h.bidsUC.MakeDecision(bidID, username, bid.Decision(decision))
 
 	if err != nil {
 		log.Println(op, err)

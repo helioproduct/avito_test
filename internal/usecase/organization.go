@@ -13,10 +13,10 @@ var (
 )
 
 type organizationUseCase struct {
-	orgRepo OrganizationRepository
+	orgRepo OrganizationRepo
 }
 
-func NewOrganizationUseCase(repo OrganizationRepository) OrganizationUseCase {
+func NewOrganizationUseCase(repo OrganizationRepo) OrganizationUseCase {
 	return &organizationUseCase{
 		orgRepo: repo,
 	}

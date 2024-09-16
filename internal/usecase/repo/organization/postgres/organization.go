@@ -9,18 +9,19 @@ import (
 	"time"
 )
 
-type postgresOrganizationRepository struct {
+type postgresOrganizationRepo struct {
 	DB *sql.DB
 }
 
-func NewPostgresOrganizationRepository(db *sql.DB) uc.OrganizationRepository {
-	return &postgresOrganizationRepository{
+func NewPostgresOrganizationRepo(db *sql.DB) uc.OrganizationRepo {
+	return &postgresOrganizationRepo{
 		DB: db,
 	}
 }
 
 // Create inserts a new organization into the database
-func (r *postgresOrganizationRepository) Create(organization *organization.Organization) (string, error) {
+func (r *postgresOrganizationRepo) Create(organization *organization.Organization) (string, error) {
+	const op = "postgres.organizatiom.Create:"
 	query := `
 		INSERT INTO organization (name, description, type, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5)
@@ -33,6 +34,7 @@ func (r *postgresOrganizationRepository) Create(organization *organization.Organ
 	// Let the database generate the UUID and return it
 	err := r.DB.QueryRow(query, organization.Name, organization.Description, organization.Type, organization.CreatedAt, organization.UpdatedAt).Scan(&organization.ID)
 	if err != nil {
+		log.Println(op, err)
 		return "", err
 	}
 
@@ -40,7 +42,7 @@ func (r *postgresOrganizationRepository) Create(organization *organization.Organ
 }
 
 // GetResponsibleUsers returns the list of users responsible for the organization
-func (r *postgresOrganizationRepository) GetResponsibleUsers(organizationID string) ([]user.User, error) {
+func (r *postgresOrganizationRepo) GetResponsibleUsers(organizationID string) ([]user.User, error) {
 	const op = "postgres.organization.GetResponsibleUsers"
 
 	query := `
@@ -62,6 +64,7 @@ func (r *postgresOrganizationRepository) GetResponsibleUsers(organizationID stri
 		var user user.User
 		err := rows.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
+			log.Println(op, err)
 			return nil, err
 		}
 		users = append(users, user)
@@ -71,7 +74,7 @@ func (r *postgresOrganizationRepository) GetResponsibleUsers(organizationID stri
 }
 
 // SetResponsibleUsers assigns a list of responsible users to an organization
-func (r *postgresOrganizationRepository) SetResponsibleUsers(organizationID string, userIDs []string) error {
+func (r *postgresOrganizationRepo) SetResponsibleUsers(organizationID string, userIDs []string) error {
 	const op = "postgtes.organization.SetResponsibleUsers:"
 
 	deleteQuery := `DELETE FROM organization_responsible WHERE organization_id = $1`
@@ -96,7 +99,7 @@ func (r *postgresOrganizationRepository) SetResponsibleUsers(organizationID stri
 	return nil
 }
 
-func (r *postgresOrganizationRepository) GetByName(name string) (*organization.Organization, error) {
+func (r *postgresOrganizationRepo) GetByName(name string) (*organization.Organization, error) {
 	const op = "postgtes.organization.GetByName:"
 
 	query := `
@@ -110,6 +113,7 @@ func (r *postgresOrganizationRepository) GetByName(name string) (*organization.O
 	if err != nil {
 		log.Println(op, err)
 		if err == sql.ErrNoRows {
+			log.Println(op, err)
 			return nil, nil
 		}
 		return nil, err
@@ -118,7 +122,7 @@ func (r *postgresOrganizationRepository) GetByName(name string) (*organization.O
 	return &org, nil
 }
 
-func (r *postgresOrganizationRepository) IsUserResponsibleForOrganization(username, organizationID string) (bool, error) {
+func (r *postgresOrganizationRepo) IsUserResponsibleForOrganization(username, organizationID string) (bool, error) {
 	const op = "postgtes.organization.IsUserResponsibleForOrganization:"
 
 	query := `
@@ -141,7 +145,7 @@ func (r *postgresOrganizationRepository) IsUserResponsibleForOrganization(userna
 	return exists, nil
 }
 
-func (r *postgresOrganizationRepository) GetAllOrganizations() ([]*organization.Organization, error) {
+func (r *postgresOrganizationRepo) GetAllOrganizations() ([]*organization.Organization, error) {
 	const op = "postgtes.organization.GetAllOrganizations:"
 
 	query := `
@@ -170,7 +174,7 @@ func (r *postgresOrganizationRepository) GetAllOrganizations() ([]*organization.
 	return orgs, nil
 }
 
-func (r *postgresOrganizationRepository) GetUserOrganizationID(userID string) (string, error) {
+func (r *postgresOrganizationRepo) GetUserOrganizationID(userID string) (string, error) {
 	const op = "postgtes.organization.GetUserOrganizationID:"
 	query := `
 		SELECT organization_id

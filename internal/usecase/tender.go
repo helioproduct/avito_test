@@ -15,13 +15,13 @@ var (
 )
 
 type tenderUseCase struct {
-	tenderRepo TenderRepository
-	orgRepo    OrganizationRepository
-	userRepo   UserRepository
+	tenderRepo TenderRepo
+	orgRepo    OrganizationRepo
+	userRepo   UserRepo
 }
 
-func NewTenderUseCase(tenderRepo TenderRepository, orgRepo OrganizationRepository,
-	userRepo UserRepository) TenderUseCase {
+func NewTenderUseCase(tenderRepo TenderRepo, orgRepo OrganizationRepo,
+	userRepo UserRepo) TenderUseCase {
 
 	return &tenderUseCase{
 		tenderRepo: tenderRepo,

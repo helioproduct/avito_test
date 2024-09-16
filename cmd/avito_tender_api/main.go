@@ -8,6 +8,7 @@ import (
 	"log"
 
 	uc "avito_api/internal/usecase"
+	advancedBidPg "avito_api/internal/usecase/repo/advancedBid/postgres"
 	bidPg "avito_api/internal/usecase/repo/bid/postgres"
 	orgPg "avito_api/internal/usecase/repo/organization/postgres"
 	tenderPg "avito_api/internal/usecase/repo/tender/postgres"
@@ -44,23 +45,28 @@ func main() {
 	log.Println("Database connection successful")
 
 	// repositories
-	userRepo := userPg.NewPostgresUserRepository(db)
-	orgRepo := orgPg.NewPostgresOrganizationRepository(db)
-	tenderRepo := tenderPg.NewPostgresTenderRepository(db)
-	bidRepo := bidPg.NewPostgresBidRepository(db)
+	userRepo := userPg.NewPostgresUserRepo(db)
+	orgRepo := orgPg.NewPostgresOrganizationRepo(db)
+	tenderRepo := tenderPg.NewPostgresTenderRepo(db)
+	bidRepo := bidPg.NewPostgresBidRepo(db)
+
+	bidAdvancedRepo := advancedBidPg.NewPostgresBidAdvancedRepo(db, bidRepo)
 
 	// usecases
 	orgUC := uc.NewOrganizationUseCase(orgRepo)
 	userUC := uc.NewUserUseCase(userRepo)
 	tenderUC := uc.NewTenderUseCase(tenderRepo, orgRepo, userRepo)
-	bidUC := uc.NewBidUseCase(bidRepo, orgRepo, userRepo, tenderRepo)
+	bidUC := uc.NewBidUseCase(bidAdvancedRepo, orgRepo, userRepo, tenderRepo)
+
+	advancedBidUC := uc.NewAdvancedBidUseCase(bidUC, bidAdvancedRepo, orgRepo, tenderRepo, 3)
 
 	// routes
 	pingHandlers := pingRoutes.NewHandlers()
 	userHandlers := userRoutes.NewHandlers(userUC)
 	orgHandlers := orgRoutes.NewHandlers(orgUC)
 	tenderHandlers := tenderRoutes.NewHandlers(tenderUC)
-	bidHandlers := bidRoutes.NewHandlers(bidUC)
+	// bidHandlers := bidRoutes.NewHandlers(bidUC)
+	bidHandlers := bidRoutes.NewHandlers(advancedBidUC)
 
 	router := chi.NewRouter()
 

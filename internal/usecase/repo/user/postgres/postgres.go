@@ -7,18 +7,19 @@ import (
 	"log"
 )
 
-type postgresUserRepository struct {
+type postgresUserRepo struct {
 	DB *sql.DB
 }
 
-func NewPostgresUserRepository(db *sql.DB) uc.UserRepository {
-	return &postgresUserRepository{
+func NewPostgresUserRepo(db *sql.DB) uc.UserRepo {
+	return &postgresUserRepo{
 		DB: db,
 	}
 }
 
-func (r *postgresUserRepository) CreateUser(user *user.User) error {
-	// Prepare the SQL query
+func (r *postgresUserRepo) CreateUser(user *user.User) error {
+	const op = "postgres.user.CreateUser:"
+
 	query := `
 			INSERT INTO employee (username, first_name, last_name, created_at, updated_at)
 			VALUES ($1, $2, $3, NOW(), NOW())
@@ -26,12 +27,15 @@ func (r *postgresUserRepository) CreateUser(user *user.User) error {
 		`
 	err := r.DB.QueryRow(query, user.Username, user.FirstName, user.LastName).Scan(&user.ID)
 	if err != nil {
+		log.Println(op, err)
 		return err
 	}
 	return nil
 }
 
-func (r *postgresUserRepository) GetUserByID(id string) (*user.User, error) {
+func (r *postgresUserRepo) GetUserByID(id string) (*user.User, error) {
+	const op = "postgres.user.GetUserByID:"
+
 	var user user.User
 	query := `
         SELECT id, username, first_name, last_name, created_at, updated_at
@@ -41,12 +45,14 @@ func (r *postgresUserRepository) GetUserByID(id string) (*user.User, error) {
 	row := r.DB.QueryRow(query, id)
 	err := row.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
+		log.Println(op, err)
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *postgresUserRepository) GetUserByUsername(username string) (*user.User, error) {
+func (r *postgresUserRepo) GetUserByUsername(username string) (*user.User, error) {
+	const op = "postgres.user.GetUserByUsername:"
 	var user user.User
 	query := `
         SELECT id, username, first_name, last_name, created_at, updated_at
@@ -56,12 +62,13 @@ func (r *postgresUserRepository) GetUserByUsername(username string) (*user.User,
 	row := r.DB.QueryRow(query, username)
 	err := row.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
+		log.Println(op, err)
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *postgresUserRepository) GetAllUsers() ([]*user.User, error) {
+func (r *postgresUserRepo) GetAllUsers() ([]*user.User, error) {
 	const op = "postgres.user.GetAllUser:"
 
 	query := `
@@ -70,6 +77,7 @@ func (r *postgresUserRepository) GetAllUsers() ([]*user.User, error) {
 	`
 	rows, err := r.DB.Query(query)
 	if err != nil {
+		log.Println(op, err)
 		return nil, err
 	}
 	defer rows.Close()

@@ -11,10 +11,10 @@ var (
 )
 
 type userUseCase struct {
-	userRepo UserRepository
+	userRepo UserRepo
 }
 
-func NewUserUseCase(repo UserRepository) *userUseCase {
+func NewUserUseCase(repo UserRepo) *userUseCase {
 	return &userUseCase{
 		userRepo: repo,
 	}

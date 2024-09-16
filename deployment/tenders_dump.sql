@@ -154,6 +154,15 @@ CREATE TABLE public.tender_versions (
 );
 
 
+CREATE TABLE public.decisions (
+    -- decision_id SERIAL PRIMARY KEY,
+    bid_id UUID NOT NULL,
+    username TEXT NOT NULL,
+    decision_value TEXT NOT NULL CHECK (decision_value IN ('Approved', 'Rejected')),
+    UNIQUE (bid_id, username, decision_value) 
+);
+
+
 ALTER TABLE public.tender_versions OWNER TO helio;
 
 --
