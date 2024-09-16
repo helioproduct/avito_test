@@ -6,7 +6,7 @@
 ```make
 docker compose -f ./deployment/docker-compose.yml up
 ```
-после этого сервис будер доступен на 0.0.0.0:8080
+после этого сервис будер доступен на localhost:8080
 
 
 Сервис также развернут на  
