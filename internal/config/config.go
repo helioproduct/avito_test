@@ -20,7 +20,7 @@ type Config struct {
 type PostgresConfig struct {
 	ConnURL      string `env:"POSTGRES_CONN"`
 	JDBCURL      string `env:"POSTGRES_JDBC_URL"`
-	Username     string `env:"POSTGRES_USERNAME`
+	Username     string `env:"POSTGRES_USERNAME"`
 	Password     string `env:"POSTGRES_PASSWORD"`
 	Host         string `env:"POSTGRES_HOST" env-default:"localhost"`
 	Port         int    `env:"POSTGRES_PORT" env-default:"5432"`
