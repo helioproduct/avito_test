@@ -13,7 +13,7 @@ docker compose -f ./deployment/docker-compose.yml up
 https://cnrprod1725726044-team-79436-32727.avito2024.codenrock.com
 
 
-### Доступные endpoins:    
+### Доступные endpoints (из задания):    
 
 1. `GET /api/ping`          `Проверка доступности`  
 2. `GET /api/tenders`          `Получить список опубликованныхх тендеров`   
@@ -32,4 +32,8 @@ https://cnrprod1725726044-team-79436-32727.avito2024.codenrock.com
 15. `PUT /api/bids/{bidId}/submit_decision`          `Отправка решения по предложению`   
 
 
+### Дополнительные endpoints (для удобства):    
+1. `GET /api/users`          `Получить список пользователей`  
+2. `GET /api/organizations/all`          `Получить список организаций`  
+2. `GET /api/organizations/responsible`          `Получить список организаций и их ответсвенных пользователей `  
 
