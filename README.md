@@ -105,6 +105,26 @@ CREATE TABLE tender (
     CONSTRAINT tender_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES employee(id) ON DELETE SET NULL
 );
 
+CREATE TABLE decisions (
+    decision_id SERIAL PRIMARY KEY,
+    bid_id UUID NOT NULL,
+    username TEXT NOT NULL,
+    decision_value TEXT NOT NULL CHECK (decision_value IN ('Approved', 'Rejected')),
+    UNIQUE (bid_id, username, decision_value)
+);
+
 ```
 
+Для удобства база данных инициализируется с тестовыми данными (организациями + ответсвенные пользователи, тендеры) 
 
+
+
+### Дополнительные требования
+
+Расширенный процесс согласования:
+Если есть хотя бы одно решение reject, предложение отклоняется.
+Для согласования предложения нужно получить решения больше или равно кворуму.
+Кворум = min(3, количество ответственных за организацию).
+
+
+Расширенный процесс согласования реализован в виде wrapper'а над стандартным usecase'ом bid
