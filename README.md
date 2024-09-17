@@ -15,7 +15,7 @@ https://cnrprod1725726044-team-79436-32727.avito2024.codenrock.com
 
 ### Доступные endpoins:    
 
-`GET /api/ping          Проверка доступности`  
+`GET /api/ping`          `Проверка доступности`  
 `GET /api/tenders          Получить список опубликованныхх тендеров`   
 `POST /api/tenders          Создать новый тендер` 
 `GET /api/tenders/my          Список пользователя в его зоне ответственности`   
