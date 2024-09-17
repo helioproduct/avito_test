@@ -30,8 +30,4 @@ HELP.md
 .vscode/
 .DS_Store
 
-# local db in docker
-docker_db
-docker-compose.yml
-
 .env

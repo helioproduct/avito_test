@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  tenders_service:
+    container_name: tenders_service
+    restart: always
+    depends_on: 
+      - tenders_db
+
+    environment:
+      - ENV=local
+      - POSTGRES_CONN=postgres://helio:passme@tenders_db:5432/tenders?sslmode=disable
+      - SERVER_ADDRESS=0.0.0.0:8080
+
+    build:
+      context: ..
+      dockerfile: ./deployment/Dockerfile
+     
+    ports:
+      - 8080:8080
+    
+    networks:
+      - app-network
+
+  tenders_db:
+    container_name: tenders_db
+
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=tenders
+      - POSTGRES_USER=helio
+      - POSTGRES_PASSWORD=passme
+
+    volumes:
+      - ./tenders_dump.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+    ports:
+      - 5433:5432
+
+    networks:
+      - app-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      # test: ["CMD-SHELL", "pg_isready", "--dbname=$POSTGRES_DB", "--username=$POSTGRES_USER", "--quiet"]
+      interval: 1s
+      timeout: 3s
+      retries: 20
+
+networks:
+  app-network:
+    driver: bridge
