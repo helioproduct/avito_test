@@ -20,7 +20,7 @@ https://cnrprod1725726044-team-79436-32727.avito2024.codenrock.com
 3. `POST /api/tenders`          `Создать новый тендер`  
 4. `GET /api/tenders/my`          `Список пользователя в его зоне ответственности`     
 5. `GET /api/tenders/{tenderId}/status`          `Получить статус тендера`   
-6. `POST /api/tenders/{tenderId}/status`          `Изменить статус тендера`   
+6. `PUT /api/tenders/{tenderId}/status`          `Изменить статус тендера`   
 7. `PATCH /api/tenders/{tenderId}/edit`        `Редактирование тендера`  
 8. `PATCH /api/tenders/{tenderId}/edit`          `Редактирование тендера`   
 9. `POST /api/bids/new`          `Создание предложения`   
