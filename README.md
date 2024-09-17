@@ -37,3 +37,74 @@ https://cnrprod1725726044-team-79436-32727.avito2024.codenrock.com
 2. `GET /api/organizations/all`          `Получить список организаций`  
 2. `GET /api/organizations/responsible`          `Получить список организаций и их ответсвенных пользователей `  
 
+### Описание таблиц базы данных:
+
+```sql
+
+CREATE TYPE organization_type AS ENUM (
+    'IE',
+    'LLC',
+    'JSC'
+);
+
+CREATE TABLE bids (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    name character varying(255) NOT NULL,
+    description text,
+    tender_id uuid NOT NULL,
+    author_type text NOT NULL,
+    author_id uuid NOT NULL,
+    status text NOT NULL,
+    decision text DEFAULT 'Pending'::text NOT NULL,
+    version integer DEFAULT 1,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT bids_tender_id_fkey FOREIGN KEY (tender_id) REFERENCES tender(id)
+);
+
+CREATE TABLE employee (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    username character varying(50) NOT NULL UNIQUE,
+    first_name character varying(50),
+    last_name character varying(50),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE organization (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    name character varying(100) NOT NULL,
+    description text,
+    type organization_type,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE organization_responsible (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    organization_id uuid,
+    user_id uuid,
+    CONSTRAINT organization_responsible_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organization(id) ON DELETE CASCADE,
+    CONSTRAINT organization_responsible_user_id_fkey FOREIGN KEY (user_id) REFERENCES employee(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tender (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    name character varying(100) NOT NULL,
+    description text,
+    servicetype text NOT NULL,
+    organization_id uuid,
+    creator_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    current_version integer DEFAULT 1,
+    status text DEFAULT 'Created'::text NOT NULL,
+    CONSTRAINT status_check CHECK ((status = ANY (ARRAY['Created'::text, 'Published'::text, 'Closed'::text]))),
+    CONSTRAINT tender_servicetype_check CHECK ((servicetype = ANY (ARRAY['Construction'::text, 'Delivery'::text, 'Manufacture'::text]))),
+    CONSTRAINT tender_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organization(id) ON DELETE CASCADE,
+    CONSTRAINT tender_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES employee(id) ON DELETE SET NULL
+);
+
+```
+
+
